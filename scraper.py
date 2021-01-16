@@ -30,8 +30,6 @@ json_data = get_retries.get(url, verbose=True, max_backoff=128).json()
 meta_motives = json_data["meta"]["motives"]
 meta_locations = json_data["meta"]["locations"]
 
-print(meta_motives)
-
 for x in json_data["entries"]:
     city = x["locationDisplay"]
 
@@ -54,11 +52,11 @@ for x in json_data["entries"]:
         chronicler_name="ezra",
     )
 
-    tab_incidents.upsert(data, ["rg_id"])
+    tab_incidents.insert(data, ["rg_id"])
 
     sources = x["sourceName"].replace("; ", ", ").split(",")
     sources_data = [
         dict(rg_id=rg_id, name=s.strip(), url=x["sourceUrl"]) for s in sources
     ]
     for s in sources_data:
-        tab_sources.upsert(s, ["rg_id"])
+        tab_sources.insert(s)
