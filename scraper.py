@@ -1,4 +1,3 @@
-
 import dataset
 import get_retries
 from bs4 import BeautifulSoup
@@ -11,7 +10,7 @@ tab_sources = db["sources"]
 tab_chronicles = db["chronicles"]
 
 
-tab_chronicles.insert(
+tab_chronicles.upsert(
     {
         "iso3166_1": "DE",
         "iso3166_2": "DE-TH",
@@ -19,7 +18,8 @@ tab_chronicles.insert(
         "chronicler_description": "ezra ist die Beratung für Betroffene rechter, rassistischer und antisemitischer Gewalt in Thüringen. Wir beraten, begleiten und unterstützen Menschen, die aus Motiven gruppenbezogener Menschenfeindlichkeit angegriffen werden – also deshalb, weil die Täter*innen sie einer von ihnen abgelehnten Personengruppe zuordnen. Daneben richtet sich unser Angebot auch an Angehörige von Betroffenen und an Zeug*innen.",
         "chronicler_url": "https://ezra.de/",
         "chronicle_source": "https://ezra.de/chronik/",
-    }
+    },
+    ["chronicler_name"],
 )
 
 
@@ -52,11 +52,11 @@ for x in json_data["entries"]:
         chronicler_name="ezra",
     )
 
-    tab_incidents.insert(data, ["rg_id"])
+    tab_incidents.upsert(data, ["rg_id"])
 
     sources = x["sourceName"].replace("; ", ", ").split(",")
     sources_data = [
         dict(rg_id=rg_id, name=s.strip(), url=x["sourceUrl"]) for s in sources
     ]
     for s in sources_data:
-        tab_sources.insert(s)
+        tab_sources.upsert(s, ["rg_id", "name"])
